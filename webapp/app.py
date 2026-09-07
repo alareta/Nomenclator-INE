@@ -4,24 +4,13 @@ España), confirmación del año detectado, y descarga de los
 entregables (Excel de concejos, Excel de municipios y .tab para
 Commons).
 
-Se abandona el plan de "una provincia por ejecución": el motor
-(parseo/emparejamiento, ver orquestador.py) ya agrupaba internamente
-por (provincia, municipio) y nunca filtró de verdad por una sola
-provincia, así que admite ficheros nacionales sin tocar nada ahí; lo
-que cambia aquí es la interfaz, que ya no exige ni valida que todos
-los ficheros sean de la misma provincia.
-
-También se retira el wikitexto de la descarga (decisión: no se va a
-usar; ver proyecto_utilidad_web_nomenclator.md). El módulo
-salida_wikitexto.py se conserva sin usar por si hiciera falta
-recuperarlo más adelante, pero esta app ya no lo importa.
+No genera wikitexto (módulo salida_wikitexto.py conservado sin usar,
+ver notas del proyecto).
 
 Ejecutar con: python app.py
-Requiere: el paquete `nomenclator` (Fase 1+2) accesible en el PYTHONPATH.
-Solo admite ficheros .xlsx ya "limpios" (sin conversión automática desde
-.xls ni reparación de referencias corruptas): si el usuario tiene un .xls
-antiguo, debe abrirlo con Excel/LibreOffice/Numbers y guardarlo como
-.xlsx antes de subirlo.
+Requiere: el paquete `nomenclator` (Fase 1+2) en el PYTHONPATH.
+Solo admite ficheros .xlsx ya "limpios": si el usuario tiene un .xls
+antiguo, debe convertirlo antes de subirlo.
 """
 
 from __future__ import annotations
@@ -173,6 +162,10 @@ def procesar():
             errores=errores,
         )
 
+    # Se pasan los ficheros nacionales tal cual, sin agrupar por provincia
+    # aquí: el orquestador ya agrupa internamente por (provincia,
+    # municipio), así que no hace falta filtrar ni validar una única
+    # provincia antes de llamarlo.
     resultado = procesar_anios(ficheros_incluidos, _dir_conversion(upload_id))
     anios = sorted(ficheros_incluidos)
     provincias_resultado = sorted({e.provincia for e in resultado.municipios})

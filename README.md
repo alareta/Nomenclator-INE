@@ -162,7 +162,7 @@ Para cerrar la app en cualquier sistema: `Ctrl+C` en la ventana/terminal donde e
 │                                     no se suben al repo público, ver .gitignore)
 │
 ├── iniciar_windows.bat              Arranque en Windows
-├── iniciar_linux.sh                 Arranque en macOS / Linux
+├── iniciar_linux.sh                 Arranque en Linux
 ├── iniciar_mac.command              Arranque por doble clic en macOS
 ├── requirements.txt                 Dependencias (Flask, openpyxl)
 ├── .gitignore

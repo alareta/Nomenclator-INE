@@ -100,7 +100,8 @@ Las dependencias de Python (Flask y openpyxl) se instalan solas la primera vez q
 
 Doble clic en `iniciar_windows.bat`. La primera vez creará un entorno virtual e instalará las dependencias; las siguientes veces arranca directamente. Se abrirá el navegador solo en `http://127.0.0.1:8080`.
 ### macOS
-Hacer doble clic en `NOMENCLATOR.command` (la primera vez, macOS puede bloquearlo por Gatekeeper — ver instrucciones dentro del propio fichero).
+
+Hacer doble clic en `iniciar_mac.command` (la primera vez, macOS puede bloquearlo por Gatekeeper — ver instrucciones dentro del propio fichero).
 
 ### Linux
 
@@ -162,7 +163,7 @@ Para cerrar la app en cualquier sistema: `Ctrl+C` en la ventana/terminal donde e
 │
 ├── iniciar_windows.bat              Arranque en Windows
 ├── iniciar_linux.sh                 Arranque en macOS / Linux
-├── NOMENCLATOR.command              Arranque por doble clic en macOS
+├── iniciar_mac.command              Arranque por doble clic en macOS
 ├── requirements.txt                 Dependencias (Flask, openpyxl)
 ├── .gitignore
 ├── LICENSE                          MIT

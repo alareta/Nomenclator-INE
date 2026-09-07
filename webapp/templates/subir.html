@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}Subir ficheros — Nomenclátor INE{% endblock %}
+{% block contenido %}
+  <p>
+    Sube los ficheros <strong>nacionales</strong> del Nomenclátor del INE
+    (uno por año, cada fichero con <strong>todas las provincias de
+    España</strong>, formato <code>.xlsx</code>). El año de cada fichero
+    se detecta automáticamente a partir de su contenido; revísalo en la
+    pantalla siguiente antes de procesar.
+  </p>
+  <p>
+    Si tienes ficheros <code>.xls</code> antiguos, ábrelos con Excel,
+    LibreOffice o Numbers y guárdalos como <code>.xlsx</code>
+    (Archivo → Guardar como… → formato .xlsx) antes de subirlos aquí.
+  </p>
+
+  {% if error %}
+    <div class="aviso aviso-error">{{ error }}</div>
+  {% endif %}
+
+  <form action="{{ url_for('procesar_subida') }}" method="post" enctype="multipart/form-data">
+    <label class="campo-ficheros">
+      <span>Ficheros nacionales del Nomenclátor</span>
+      <input type="file" name="ficheros" multiple accept=".xlsx" required>
+    </label>
+    <button type="submit">Subir y detectar año</button>
+  </form>
+  <br><br>
+  <hr>
+  <p>
+    ¿Ya tienes procesado un año y descargado su <strong>CSV del INE</strong>?
+  </p>
+  <p>	
+    Puedes <a href="{{ url_for('cruce') }}">CRUZARLO CON WIKIDATA</a> para
+    generar el fichero <code>.tab</code> de Commons con el ítem Q ya
+    adjudicado.
+  </p>
+  <p>
+	Es un paso independiente: no necesitas volver a procesar.
+  </p>
+{% endblock %}

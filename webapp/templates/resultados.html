@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}Resultados — Nomenclátor INE{% endblock %}
+{% block contenido %}
+  <p>Ámbito: <strong>Nacional</strong> ({{ n_provincias }} provincia{{ 's' if n_provincias != 1 else '' }}
+     detectada{{ 's' if n_provincias != 1 else '' }} en los ficheros incluidos) — años procesados:
+     {{ anios | join(', ') }}</p>
+
+  <ul class="resumen">
+    <li><strong>{{ n_municipios }}</strong> municipios</li>
+    <li><strong>{{ n_concejos }}</strong> unidades poblacionales</li>
+    {% if hay_1981 %}
+    <li><strong>{{ n_nuevos }}</strong> unidades poblacionales nuevas (sin dato anterior a 1991)</li>
+    <li><strong>{{ n_desaparecidos }}</strong> unidades poblacionales desaparecidas/agregadas (solo dato de 1981)</li>
+    {% endif %}
+  </ul>
+
+  {% if discrepancias %}
+    <div class="aviso aviso-error">
+      <strong>{{ discrepancias | length }} discrepancia(s) de cuadre unidades poblacionales↔municipio.</strong>
+      Revisa la hoja de notas metodológicas del Excel antes de publicar.
+      <ul>
+        {% for d in discrepancias %}
+          <li>{{ d.anio }} — {{ d.municipio_nombre }}: municipio={{ d.poblacion_municipio }},
+              suma unidades={{ d.suma_concejos }} (diferencia {{ d.diferencia }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <div class="aviso aviso-ok">Sin discrepancias de cuadre unidades poblacionales↔municipio en ningún año.</div>
+  {% endif %}
+
+  {% if resumen_casos_dudosos %}
+    <div class="aviso aviso-atencion">
+      <strong>{{ n_casos_dudosos }} caso(s) a revisar en el emparejamiento 1981↔1991+.</strong>
+      No bloquean la descarga: el código INE es la única clave que fusiona
+      población entre años; estos casos quedan marcados en las columnas
+      "Estado" y "Sugerencia" del Excel de unidades poblacionales para que decidas tú.
+      {% for grupo in resumen_casos_dudosos %}
+        <p><strong>{{ grupo.n }}</strong> — {{ grupo.etiqueta }}</p>
+        <ul>
+          {% for c in grupo.ejemplos %}
+            <li>{{ c.entidad.municipio_nombre }} / {{ c.entidad.nombre }}
+                (score: {{ "%.2f"|format(c.score) if c.score is not none else "—" }};
+                Código INE {{ c.codigo_ine }}{% if c.detalle %}; {{ c.detalle }}{% endif %})</li>
+          {% endfor %}
+          {% if grupo.n_ocultos %}
+            <li><em>… y {{ grupo.n_ocultos }} más (ver columnas "Estado"/"Sugerencia" en el Excel de unidades poblacionales).</em></li>
+          {% endif %}
+        </ul>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2>Descargas</h2>
+  <ul class="descargas">
+    <li><a href="{{ url_for('descargar', job_id=job_id, tipo='excel_concejos') }}">Excel — Unidades poblacionales</a></li>
+    <li><a href="{{ url_for('descargar', job_id=job_id, tipo='excel_municipios') }}">Excel — Municipios</a></li>
+    <li><a href="{{ url_for('descargar', job_id=job_id, tipo='excel_combinado') }}">Excel — Municipios y unidades poblacionales juntos (una hoja, cada municipio seguido de sus unidades)</a></li>
+    <li><a href="{{ url_for('descargar', job_id=job_id, tipo='csv_ine') }}">CSV del INE — un fichero por año, municipios y unidades juntos, para cruzar después con Wikidata (.zip)</a></li>
+  </ul>
+
+  <p><a href="{{ url_for('subir') }}">← Procesar otros ficheros</a></p>
+{% endblock %}

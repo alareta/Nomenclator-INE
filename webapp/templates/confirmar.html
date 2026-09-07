@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Confirmar ficheros — Nomenclátor INE{% endblock %}
+{% block contenido %}
+  <p>Revisa el año detectado para cada fichero antes de procesar.
+     Desmarca los que no quieras incluir en esta ejecución.</p>
+  <p class="ayuda">
+    La columna «Provincias detectadas» cuenta los códigos de provincia
+    distintos que aparecen en todo el fichero: en un fichero nacional
+    real deberían salir unas 52 (50 provincias + Ceuta y Melilla). No
+    filtra ni restringe nada, es solo una comprobación de que el
+    fichero subido tiene pinta de ser nacional.
+  </p>
+
+  {% if errores %}
+    <div class="aviso aviso-error">
+      <ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  {% endif %}
+
+  <form action="{{ url_for('procesar') }}" method="post">
+    <input type="hidden" name="upload_id" value="{{ upload_id }}">
+    <table class="tabla-confirmacion">
+      <thead>
+        <tr>
+          <th>Incluir</th>
+          <th>Fichero</th>
+          <th>Año detectado</th>
+          <th>Provincias detectadas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in ficheros %}
+        <tr>
+          <td><input type="checkbox" name="incluir_{{ loop.index0 }}" checked></td>
+          <td>{{ f.nombre_original }}</td>
+          <td>
+            <input type="number" name="anio_{{ loop.index0 }}"
+                   value="{{ f.anio_detectado or '' }}"
+                   min="1900" max="2100"
+                   class="{{ 'sin-detectar' if not f.anio_detectado }}"
+                   required>
+            {% if f.error_deteccion %}
+              <div class="aviso-linea">{{ f.error_deteccion }}</div>
+            {% elif not f.anio_detectado %}
+              <span class="aviso-linea">no detectado, indícalo a mano</span>
+            {% endif %}
+          </td>
+          <td>
+            {{ f.n_provincias_detectadas if f.n_provincias_detectadas is not none else '—' }}
+            {% if f.aviso_pocas_provincias %}
+              <div class="aviso-linea">pocas provincias: ¿seguro que es un fichero nacional?</div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit">Procesar</button>
+  </form>
+{% endblock %}

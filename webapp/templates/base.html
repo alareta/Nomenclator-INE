@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>{% block titulo %}Nomenclátor INE{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Nomenclátor INE → tabla nacional</h1>
+  </header>
+  <main>
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

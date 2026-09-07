@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block titulo %}Cruzar con Wikidata — Nomenclátor INE{% endblock %}
+{% block contenido %}
+  <h2>Cruzar con Wikidata</h2>
+  <p>
+    Genera el fichero <code>.tab</code> de Wikimedia Commons de un año,
+    combinando municipios y unidades poblacionales, con el ítem Q de
+    Wikidata ya adjudicado. 
+  </p>
+  <p>	
+	Solo se incluyen las entidades que tienen
+    ítem en Wikidata ese año.
+  </p>
+
+  {% if error %}
+    <div class="aviso aviso-error">{{ error }}</div>
+  {% endif %}
+
+  {% if listo %}
+    {# --- Paso 3: resultado --- #}
+    <div class="aviso">
+      Fichero generado para <strong>{{ anio }}</strong>:
+      <strong>{{ n_filas }}</strong> entidades con ítem de Wikidata
+      (de <strong>{{ n_cruce }}</strong> códigos con Q en el fichero de
+      Wikidata).
+    </div>
+    <p>
+      <a href="{{ url_for('cruce_descargar', cruce_id=cruce_id) }}">
+        Descargar {{ nombre_tab }}
+      </a>
+    </p>
+    <p><a href="{{ url_for('cruce') }}">← Hacer otro cruce</a></p>
+
+  {% elif cruce_id %}
+    {# --- Paso 2: confirmar año --- #}
+    <p>
+      Ficheros recibidos: <code>{{ nombre_ine }}</code> (INE) y
+      <code>{{ nombre_query }}</code> (Wikidata).
+    </p>
+    <form action="{{ url_for('cruce_generar') }}" method="post">
+      <input type="hidden" name="cruce_id" value="{{ cruce_id }}">
+      <label class="campo-anio">
+        <span>Año del fichero</span>
+        <input type="number" name="anio" value="{{ anio_detectado or '' }}"
+               min="1900" max="2100" required
+               placeholder="p. ej. 2025">
+      </label>
+      {% if not anio_detectado %}
+        <p class="aviso aviso-error">
+          No se pudo detectar el año en el nombre del CSV del INE.
+          Indícalo manualmente.
+        </p>
+      {% endif %}
+      <button type="submit">Generar .tab con Q</button>
+    </form>
+
+  {% else %}
+    {# --- Paso 1: subir ficheros --- #}
+    <form action="{{ url_for('cruce_subir') }}" method="post" enctype="multipart/form-data">
+      <label class="campo-ficheros">
+        <span>CSV del INE (el generado al procesar los datos descargados del INE , p. ej. <code>ine_2025.csv</code>)</span>
+        <input type="file" name="csv_ine" accept=".csv" required>
+      </label>
+      <label class="campo-ficheros">
+        <span>CSV de Wikidata (la consulta generada en wikidata que relaciona cod. INE y Q correspondiente, consulta con columnas <code>item</code>, <code>value</code>)</span>
+        <input type="file" name="query_csv" accept=".csv" required>
+      </label>
+      <button type="submit">Subir y detectar año</button>
+    </form>
+  {% endif %}
+
+  <p><a href="{{ url_for('subir') }}">← Volver a procesar ficheros del INE</a></p>
+{% endblock %}

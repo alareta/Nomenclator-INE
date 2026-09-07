@@ -1,0 +1,71 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  border-bottom: 2px solid #88c2cc;
+  padding-bottom: 0.5rem;
+}
+
+.aviso {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+.aviso-error { background: #fbe4e4; border: 1px solid #d98c8c; }
+.aviso-atencion { background: #fff6db; border: 1px solid #e0c351; }
+.aviso-ok { background: #e2f3ee; border: 1px solid #88c2ac; }
+
+.campo-ficheros {
+  display: block;
+  margin: 1.5rem 0;
+}
+.campo-ficheros span {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+button {
+  background: #2b6f7a;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+button:hover { background: #1f545c; }
+
+table.tabla-confirmacion {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 1rem;
+}
+table.tabla-confirmacion th,
+table.tabla-confirmacion td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+table.tabla-confirmacion th { background: #f4f8f8; }
+
+input.sin-detectar { border: 2px solid #e0a351; }
+.aviso-linea { color: #a8631a; font-size: 0.85rem; margin-left: 0.4rem; }
+
+ul.resumen { list-style: none; padding: 0; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+ul.resumen li {
+  background: #f4f8f8;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+}
+
+ul.descargas { padding-left: 1.2rem; }
+ul.descargas li { margin: 0.4rem 0; }

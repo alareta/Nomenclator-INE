@@ -33,7 +33,7 @@ Y una segunda herramienta, **Cruzar con Wikidata** (independiente del procesado,
 ### 1. Entrada: ficheros nacionales, uno por año
 
 Subes 1 o más ficheros `.xlsx` del Nomenclátor descargados del INE, cada uno con **todas las provincias de España** para un año dado (1981, 1991, 2001, 2011, 2021, 2025...). La app detecta automáticamente el año de cada fichero a partir de su contenido (no del nombre del fichero) y cuenta cuántas provincias distintas hay en él, como aviso si el fichero subido no parece nacional de verdad. No hace falta que todos los ficheros sean
-del mismo año-tipo ni que estén completos: puedes subir solo 1981, solo un año 1991+, o cualquier combinación.
+del mismo año-tipo ni que estén completos: puedes subir un solo año o cualquier combinación.
 URL de descarga: https://ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177010&idp=1254735572981
 
 > **Aviso metodológico — 2024 en adelante:** desde el 1 de enero de 2024 el Nomenclátor cambia su fuente de población: pasa del Padrón Municipal al **Censo Anual de Población** (que cruza el padrón con registros de la Seguridad Social, Hacienda y educación). El formato del fichero `.xlsx` es idéntico, pero los datos de 2024 y 2025 **no son directamente comparables** con los de 1981-2023 en cuanto a la fuente subyacente, aunque el propio INE considera el Censo Anual una aproximación metodológicamente superior a la población real residente. Más detalle en la nota oficial del INE: https://www.ine.es/metodologia/Cifras_municipios.pdf
@@ -48,16 +48,16 @@ De cada fichero se extraen dos niveles:
 
 ### 3. Emparejamiento 1981 ↔ 1991 en adelante: el código INE es la referencia correcta.
 
-Esta es la parte más delicada, y la que ha cambiado más veces durante el desarrollo. La versión actual se basa en un hecho confirmado con la metodología oficial del INE (ver
-[https://www.ine.es/nomenclator/metodologia.htm](https://www.ine.es/nomenclator/metodologia.htm)): el código de entidad (provincia + municipio + 4 dígitos) se fijó por orden alfabético en el Censo de 1981 y se ha mantenido sin cambios desde entonces; el código de una entidad que desaparece **no se reutiliza** para otra distinta.
+Esta es la parte más delicada, y la que ha cambiado más veces durante el desarrollo. La versión actual se basa en el hecho confirmado según la metodología oficial del INE (ver
+[https://www.ine.es/nomenclator/metodologia.htm](https://www.ine.es/nomenclator/metodologia.htm)): el código de entidad (provincia + municipio + 4 dígitos) se asignó por primera vez, por orden alfabético dentro de cada municipio, con ocasión del Censo de Población de 1981, y se ha mantenido sin cambios desde entonces; el código de una entidad que desaparece **no se reutiliza** para otra distinta (la única excepción documentada por el INE es que, si esa misma entidad se da de alta de nuevo más adelante, recupera el código que tenía antes de la baja — no se le asigna a una entidad diferente).
 
 Por eso:
 
-- **El código es la ÚNICA clave que fusiona población entre 1981 y 1991+.** Si el código de una entidad de 1981 coincide con el de una entidad de 1991 en adelante (dentro del mismo municipio), se fusionan en una sola fila con toda la serie histórica — **sin exigir que el nombre coincida**: el nombre puede haber cambiado por completo (se marca `directo_renombrado` como aviso, no bloqueante).
-- **Sin coincidencia de código, NO se fusiona población.** La unidad poblacional de 1981 queda como fila propia (`desaparecido`, solo dato de 1981) y el de 1991+ queda como fila propia (`nuevo`, sin dato de 1981) — nunca se combinan por parecido de nombre. Fusionar ahí mezclaría, con alta probabilidad, datos de dos lugares distintos: se comprobó con los 6 ficheros nacionales reales que el 100% de los emparejamientos "solo por nombre" de una versión anterior de esta herramienta unían una entidad de 1991+ cuyo código no había existido nunca en 1981 — exactamente el tipo de mezcla que el propio INE dice que su sistema de códigos existe para evitar.
+- **El código es la ÚNICA clave que fusiona población desde 1981.** Si el código de una entidad de 1981 coincide con el de una entidad de 1991 en adelante (dentro del mismo municipio), se fusionan en una sola fila con toda la serie histórica — **sin exigir que el nombre coincida**: el nombre puede haber cambiado por completo (se marca `directo_renombrado` como aviso, no bloqueante).
+- **Sin coincidencia de código, NO se fusiona población.** La unidad poblacional de 1981 queda como fila propia (`desaparecido`, solo dato de 1981) y la unidad poblacional de años posteriores queda como fila propia (`nuevo`, sin dato de 1981) — nunca se combinan por parecido de nombre. Fusionar por nombre mezclaría, con alta probabilidad, datos de dos lugares distintos. Se comprobó con los 6 ficheros nacionales reales: el 100% de los emparejamientos "solo por nombre" de una versión anterior de esta herramienta unían una entidad posterior a 1981 cuyo código no había existido nunca en ese año. Es exactamente el tipo de mezcla que el propio INE dice que su sistema de códigos evita.
 - Aun así, se calcula una **sugerencia informativa** por similitud de nombre entre las entidades sin código coincidente (columna "Sugerencia" del Excel de unidades poblacionales: p. ej. "¿Castelo? (código 2301, score 0.53)"). Es solo una pista para revisión manual — el sistema nunca la da por buena ni fusiona población con ella.
-- El emparejamiento por código busca en **todos** los años 1991+ incluidos en la ejecución, no solo en el primero: una entidad puede faltar en el fichero de un año concreto y reaparecer en años posteriores con el mismo código.
-- Todo esto (columna "Estado", `desaparecido`/`nuevo`/sugerencias) solo aparece si el fichero de **1981** forma parte de la ejecución. Si procesas años 1991+ sin incluir 1981, no hay nada contra lo que emparejar y ninguna entidad se marca como `nuevo` ni `desaparecido` — decirlo sería engañoso, ya que no se ha comprobado nada, solo no se ha buscado.
+- El emparejamiento por código busca en **todos** los años posteriores a 1981 incluidos en la ejecución, no solo en el primero: una entidad puede faltar en el fichero de un año concreto y reaparecer en años posteriores con el mismo código.
+- Todo esto (columna "Estado", `desaparecido`/`nuevo`/sugerencias) solo aparece si el fichero de **1981** forma parte de la ejecución. Si procesas años posteriores sin incluir 1981, no hay nada contra lo que emparejar y ninguna entidad se marca como `nuevo` ni `desaparecido` — decirlo sería engañoso, ya que no se ha comprobado nada, solo no se ha buscado.
 - Cuando una entidad aparece en varios años con nombres distintos (evolución normal de la ortografía o un renombrado real), el nombre que se muestra es siempre el del **año más reciente incluido** en la ejecución — el mismo criterio que usarías para nombrar el artículo de Wikipedia hoy. Aplica igual a municipios y a unidades poblacionales.
 
 Los cuatro estados posibles de emparejamiento son, en resumen:
@@ -81,7 +81,7 @@ Para cada municipio y año se comprueba que la suma de sus unidades poblacionale
 - **CSV del INE** (uno por año, `ine_<año>.csv`): municipios y unidades combinados, todas las filas, con columnas codigo_ine, tipo, provincia, municipio, nombre, entidad_colectiva y poblacion del año. Es el fichero de intercambio hacia la herramienta de cruce; lleva todas las entidades (el filtrado a las que tienen ítem de Wikidata ocurre en el cruce).
 - **Fichero `.tab` para Commons** (lo produce la herramienta de cruce, no el procesado): combinado (municipios y unidades en el mismo fichero), por año, con columnas codigo_ine (sin guiones, formato crudo de Wikidata), unidad, municipio, poblacion e id_wikidata. Sin columna «tipo»: se deduce de si «unidad» va vacío (municipio) o relleno (unidad). Títulos de columna y textos (`description`, `sources`) solo en inglés, por ser Commons un proyecto internacional. JSON compacto, sin indentado, para no acercarse al límite de 2 MB de Commons. Contiene solo las entidades con ítem de Wikidata ese año. Listo para subir al espacio `Data:` de Wikimedia Commons (la subida en sí queda fuera del alcance de la herramienta).
 
-El **Código INE** que identifica a cada entidad tiene formato de unidad poblacional del Nomenclátor: `provincia-municipio-código de unidad` de 6 dígitos (entidad colectiva + entidad singular + núcleo/diseminado). Así, un municipio es `01-037-000000` y una entidad singular `01-037-010100` (ver https://www.ine.es/nomenclator/ayuda.htm). Es el mismo formato con el que se cruza contra los códigos de Wikidata. Única excepción: las entidades «desaparecidas» que solo tienen dato de 1981 conservan su código de 4 dígitos de aquel año (p. ej. `01-037-0101`), que pertenece a un esquema distinto (sin desglose de 6 dígitos) y no se rellena para no fabricar un código de unidad de 1991+ inexistente. Es seguro que el identificador sea así de directo porque el código es la única clave que fusiona población (ver sección 3): si el código de una entidad sin pareja
+El **Código INE** que identifica a cada entidad tiene formato de unidad poblacional del Nomenclátor: `provincia-municipio-código de unidad` de 6 dígitos (entidad colectiva + entidad singular + núcleo/diseminado). Así, un municipio es `01-037-000000` y una entidad singular `01-037-010100` (ver https://www.ine.es/nomenclator/ayuda.htm). Es el mismo formato con el que se cruza contra los códigos de Wikidata. Única excepción: las entidades «desaparecidas» que solo tienen dato de 1981 conservan su código de 4 dígitos de aquel año (p. ej. `01-037-0101`), que pertenece a un esquema distinto (sin desglose de 6 dígitos) y no se rellena para no fabricar un código de unidad en años posteriores inexistente. Es seguro que el identificador sea así de directo porque el código es la única clave que fusiona población (ver sección 3): si el código de una entidad sin pareja
 coincidiera con el de otra entidad real del mismo municipio, ya se habrían fusionado en una sola fila antes de llegar a mostrarse por separado. Comprobado también con los 6 ficheros nacionales reales: cero colisiones.
 
 ## Requisitos
@@ -98,7 +98,7 @@ Las dependencias de Python (Flask y openpyxl) se instalan solas la primera vez q
 
 ### Windows
 
-Doble clic en `iniciar_windows.bat`. La primera vez creará un entorno virtual e instalará las dependencias; las siguientes veces arranca directamente. Se abrirá el navegador solo en `http://127.0.0.1:8080`.
+Doble clic en `iniciar_windows.bat`. 
 ### macOS
 
 Hacer doble clic en `iniciar_mac.command` (la primera vez, macOS puede bloquearlo por Gatekeeper — ver instrucciones dentro del propio fichero).
@@ -157,9 +157,7 @@ Para cerrar la app en cualquier sistema: `Ctrl+C` en la ventana/terminal donde e
 │   ├── test_entidad_colectiva.py
 │   └── test_webapp.py
 │
-├── fixtures/                        Ficheros reales de Álava para los tests
-│                                    (provinciales, previos al cambio a nacionales;
-│                                     no se suben al repo público, ver .gitignore)
+├── fixtures/                        Ficheros reales de prueba, ver sección Tests
 │
 ├── iniciar_windows.bat              Arranque en Windows
 ├── iniciar_linux.sh                 Arranque en Linux

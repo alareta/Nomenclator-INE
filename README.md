@@ -180,4 +180,4 @@ Los tests se dividen en dos grupos: los **sintéticos**, que construyen sus prop
 
 ## Licencia
 
-MIT. Ver el fichero `LICENSE` (o el encabezado del repositorio) para el texto completo.
+MIT. Ver el fichero `LICENSE` para el texto completo.

@@ -7,6 +7,7 @@ Corre en tu propio ordenador; no necesita conexión a internet salvo para instal
 ## Índice
 
 - [Qué genera](#qué-genera)
+- [Cómo se usa](#cómo-se-usa)
 - [Qué hace exactamente](#qué-hace-exactamente)
 - [Requisitos](#requisitos)
 - [Cómo arrancarla](#cómo-arrancarla)
@@ -27,6 +28,24 @@ Y una segunda herramienta, **Cruzar con Wikidata** (independiente del procesado,
 - **Fichero `.tab` para Wikimedia Commons**, combinado (municipios y unidades en el mismo fichero) y por año, con el ítem Q de Wikidata ya adjudicado. Contiene solo las entidades que tienen ítem en Wikidata ese año. A partir del CSV del INE + un CSV de códigos↔Q descargado de una consulta de Wikidata.
 
 > El wikitexto de `{{Gráfica de evolución}}`, que formaba parte de versiones anteriores de esta herramienta, se ha retirado: ya no se usa. El módulo que lo generaba (`salida_wikitexto.py`) sigue en el repositorio sin uso activo, por si hiciera falta recuperarlo, pero la app no lo genera ni lo ofrece para descarga.
+
+## Cómo se usa
+
+**1. Subir los ficheros del INE.** Desde la pantalla inicial se seleccionan uno o varios ficheros nacionales `.xlsx`. Abajo está el acceso a la herramienta de cruce con Wikidata.
+
+![Pantalla inicial: subida de ficheros](docs/capturas/01-subir.png)
+
+**2. Revisar el año detectado.** La app muestra el año que ha detectado en cada fichero (editable) y cuántas provincias contiene, como comprobación de que el fichero es nacional.
+
+![Confirmación del año detectado](docs/capturas/02-confirmar.png)
+
+**3. Descargar los resultados.** Tras procesar, se muestra el resumen (municipios, unidades poblacionales, cuadre) y los enlaces de descarga de los Excel y del CSV del INE.
+
+![Resultados y descargas](docs/capturas/03-resultados.png)
+
+**4. Cruzar con Wikidata (opcional).** Con el CSV del INE de un año y el CSV de una consulta de Wikidata, genera el fichero `.tab` para Commons.
+
+![Cruce con Wikidata](docs/capturas/04-cruce.png)
 
 ## Qué hace exactamente
 
@@ -98,7 +117,8 @@ Las dependencias de Python (Flask y openpyxl) se instalan solas la primera vez q
 
 ### Windows
 
-Doble clic en `iniciar_windows.bat`. 
+Doble clic en `iniciar_windows.bat`.
+
 ### macOS
 
 Hacer doble clic en `iniciar_mac.command` (la primera vez, macOS puede bloquearlo por Gatekeeper — ver instrucciones dentro del propio fichero).
